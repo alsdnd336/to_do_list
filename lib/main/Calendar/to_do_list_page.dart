@@ -22,14 +22,18 @@ class _ToDoListPageState extends State<ToDoListPage> {
   FocusNode _nodeText1 = FocusNode();
 
   List<Widget> contentsList = [];
-
+  
   @override
   void initState() {
     month = widget.date.month;
     days = widget.date.day;
 
+
     // allocation widget
+    bool isChecked = false;
+
     contentsList = [
+      
       TextFormField(
         maxLines: null,
         cursorColor: Colors.blue,
@@ -37,7 +41,16 @@ class _ToDoListPageState extends State<ToDoListPage> {
         decoration: InputDecoration(
           focusedBorder: InputBorder.none,
           enabledBorder: InputBorder.none,
-          hintText: '내용을 입력하시오..'
+          hintText: '내용을 입력하시오..',
+          prefixIcon: Checkbox(
+              value: isChecked,
+              onChanged: (value) {
+                setState(() {
+                  isChecked = value!;
+                });
+              },
+            ),
+          
         ),
       ),
     ];
@@ -69,14 +82,14 @@ class _ToDoListPageState extends State<ToDoListPage> {
           padding: const EdgeInsets.all(15),
           width: MediaQuery.of(context).size.width -30,
           height: MediaQuery.of(context).size.height / 3,
-          child: const Column(
+          child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Toolitem(icon: Icon(Icons.check_box, color: Colors.blue,), text: '할 일 목록',),
-              SizedBox(height: 10,),
-              Toolitem(icon: Icon(Icons.text_fields_outlined, color: Colors.black,), text: '텍스트',),
-              SizedBox(height: 10,),
-              Toolitem(icon: Icon(Icons.feedback, color: Colors.black,), text: '피드백',),
+              Toolitem(icon: Icon(Icons.check_box, color: Colors.blue, ), text: '할 일 목록', onTap: (){}),
+              const SizedBox(height: 10,),
+              Toolitem(icon: Icon(Icons.text_fields_outlined, color: Colors.black,), text: '텍스트', onTap: (){},),
+              const SizedBox(height: 10,),
+              Toolitem(icon: Icon(Icons.feedback, color: Colors.black,), text: '피드백', onTap: (){},),
             ],
           ),
         ),
@@ -84,33 +97,9 @@ class _ToDoListPageState extends State<ToDoListPage> {
     });
   }
 
-  Widget CheckBoxField() {
-    bool ischecked = false;
-    TextEditingController _newController = TextEditingController();
-
-    return Container(
-      padding: EdgeInsets.all(5),
-      child: Row(
-        children: [
-          Checkbox(
-            value: ischecked,
-            onChanged: (newValue){
-              setState(() {
-                ischecked = newValue!;
-              });
-          }),
-          Expanded(child: TextFormField(
-            controller: _newController,
-          ))
-        ],
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final isKeyboard = MediaQuery.of(context).viewInsets.bottom != 0;
-
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -122,8 +111,11 @@ class _ToDoListPageState extends State<ToDoListPage> {
       body: Column(
         children: [
           Expanded(
-            child: ListView(
-              children: contentsList,
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: 10),
+              child: ListView(
+                children: contentsList,
+              ),
             )
           ),
             if(isKeyboard)
@@ -138,16 +130,18 @@ class Toolitem extends StatelessWidget {
   const Toolitem({
     required this.icon,
     required this.text,
+    required this.onTap,
     super.key,
   });
 
   final Icon icon;
   final String text;
+  final Function() onTap;
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: (){},
+      onTap: onTap,
       child: Container(
         padding: EdgeInsets.all(15),
         decoration: BoxDecoration(
