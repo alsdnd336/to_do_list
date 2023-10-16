@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 
+List<String> contentsList = ['checkField'];
 
 class ToDoListPage extends StatefulWidget {
   const ToDoListPage({required this.date, required this.event, super.key});
@@ -15,45 +15,36 @@ class _ToDoListPageState extends State<ToDoListPage> {
   late int month;
   late int days;
   bool keyPadVisible = false;
-  
-  KeyboardVisibilityController keyboardVisibilityController = KeyboardVisibilityController();
 
   TextEditingController _controller = TextEditingController();
   FocusNode _nodeText1 = FocusNode();
 
-  List<Widget> contentsList = [];
+  Widget addTextFormField() {
+    return TextFormField(
+      maxLines: null,
+      onFieldSubmitted: (value) => addTextFormField(),
+      cursorColor: Colors.blue,
+      controller: _controller,
+      textInputAction: TextInputAction.done,
+      decoration: InputDecoration(
+        focusedBorder: InputBorder.none,
+        enabledBorder: InputBorder.none,
+        hintText: '내용을 입력하시오..',
+      ),
+    );
+  }
+
+  Widget addFeedBack() {
+    return Container();
+  }
+  
+
+    bool isChecked = false;
   
   @override
   void initState() {
     month = widget.date.month;
     days = widget.date.day;
-
-
-    // allocation widget
-    bool isChecked = false;
-
-    contentsList = [
-      
-      TextFormField(
-        maxLines: null,
-        cursorColor: Colors.blue,
-        controller: _controller,
-        decoration: InputDecoration(
-          focusedBorder: InputBorder.none,
-          enabledBorder: InputBorder.none,
-          hintText: '내용을 입력하시오..',
-          prefixIcon: Checkbox(
-              value: isChecked,
-              onChanged: (value) {
-                setState(() {
-                  isChecked = value!;
-                });
-              },
-            ),
-          
-        ),
-      ),
-    ];
     
     super.initState();
   }
@@ -110,14 +101,20 @@ class _ToDoListPageState extends State<ToDoListPage> {
       ),
       body: Column(
         children: [
-          Expanded(
-            child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 10),
-              child: ListView(
-                children: contentsList,
-              ),
-            )
-          ),
+            Expanded(
+              child: ListView.builder(
+                itemCount: contentsList.length,
+                itemBuilder: (context, index) {
+                  if(contentsList[index] == 'checkField'){
+                    return CheckField();
+                  }else if(contentsList[index] == 'feedBack'){
+                    return addFeedBack();
+                  } else {
+                    return addTextFormField();
+                  }
+                }
+              )
+            ),
             if(isKeyboard)
             keyPadToolbar(),
         ],
@@ -159,5 +156,46 @@ class Toolitem extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+
+class CheckField extends StatefulWidget {
+  const CheckField({super.key});
+
+  @override
+  State<CheckField> createState() => _CheckFieldState();
+}
+
+class _CheckFieldState extends State<CheckField> {
+  final _controller = TextEditingController();
+  bool isSelected = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return TextFormField(
+        maxLines: null,
+        onFieldSubmitted: (value) => {
+          print('실행중'),
+          contentsList.add('checkField'),
+          setState(() {})
+        },
+        cursorColor: Colors.blue,
+        controller: _controller,
+        textInputAction: TextInputAction.done,
+        decoration: InputDecoration(
+          focusedBorder: InputBorder.none,
+          enabledBorder: InputBorder.none,
+          hintText: '내용을 입력하시오..',
+          prefixIcon: Checkbox(
+              value: isSelected,
+              onChanged: (value) {
+                setState(() {
+                  isSelected = value!;
+                });
+              },
+            ),
+        ),
+      );
   }
 }
