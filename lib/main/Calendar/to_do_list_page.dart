@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-
-List<String> contentsList = ['checkField'];
+import 'package:provider/provider.dart';
+import 'package:to_do_list/provider/to_do_list_Provider.dart';
+import 'package:flutter_quill/flutter_quill.dart' as quill;
 
 class ToDoListPage extends StatefulWidget {
   const ToDoListPage({required this.date, required this.event, super.key});
@@ -16,76 +17,67 @@ class _ToDoListPageState extends State<ToDoListPage> {
   late int days;
   bool keyPadVisible = false;
 
-  TextEditingController _controller = TextEditingController();
-  FocusNode _nodeText1 = FocusNode();
+  quill.QuillController _quillController = quill.QuillController.basic();
 
-  Widget addTextFormField() {
-    return TextFormField(
-      maxLines: null,
-      onFieldSubmitted: (value) => addTextFormField(),
-      cursorColor: Colors.blue,
-      controller: _controller,
-      textInputAction: TextInputAction.done,
-      decoration: InputDecoration(
-        focusedBorder: InputBorder.none,
-        enabledBorder: InputBorder.none,
-        hintText: '내용을 입력하시오..',
-      ),
-    );
-  }
+  bool isChecked = false;
 
-  Widget addFeedBack() {
-    return Container();
-  }
-  
-
-    bool isChecked = false;
-  
   @override
   void initState() {
     month = widget.date.month;
     days = widget.date.day;
-    
+
     super.initState();
   }
 
-  Widget keyPadToolbar () {
+  Widget keyPadToolbar() {
     return Container(
-      decoration: BoxDecoration(
-        color: Colors.grey[200]
-      ),
+      decoration: BoxDecoration(color: Colors.grey[200]),
       width: double.infinity,
       height: 50,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          IconButton(onPressed: toolList, icon: Icon(Icons.add)),
-          IconButton(onPressed: () => FocusScope.of(context).unfocus(), icon: Icon(Icons.keyboard_double_arrow_down)),
+          Expanded(child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child:  Padding(
+              padding: EdgeInsets.symmetric(horizontal: 10),
+              child: quill.QuillToolbar.basic(
+                
+                controller: _quillController, 
+                showFontFamily: false,
+                showCodeBlock: false,
+                showUndo: false,
+                showRedo: false,
+                showLink: false,
+                showSearchButton: false,
+                showFontSize: false,
+                showInlineCode: false,
+                showSubscript: false,
+                showSuperscript: false,
+              ),
+            ),
+          )),
+          IconButton(
+              onPressed: () => FocusScope.of(context).unfocus(),
+              icon: Icon(Icons.keyboard_double_arrow_down)),
         ],
       ),
     );
   }
 
   void toolList() {
-    showDialog(context: context, builder: (context) {
-      return Dialog(
-        child:  Container(
-          padding: const EdgeInsets.all(15),
-          width: MediaQuery.of(context).size.width -30,
-          height: MediaQuery.of(context).size.height / 3,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Toolitem(icon: Icon(Icons.check_box, color: Colors.blue, ), text: '할 일 목록', onTap: (){}),
-              const SizedBox(height: 10,),
-              Toolitem(icon: Icon(Icons.text_fields_outlined, color: Colors.black,), text: '텍스트', onTap: (){},),
-              const SizedBox(height: 10,),
-              Toolitem(icon: Icon(Icons.feedback, color: Colors.black,), text: '피드백', onTap: (){},),
-            ],
-          ),
-        ),
-      );
-    });
+    showDialog(
+        context: context,
+        builder: (context) {
+          return Dialog(
+            child: Container(
+              padding: const EdgeInsets.all(15),
+              width: MediaQuery.of(context).size.width - 30,
+              height: MediaQuery.of(context).size.height / 3,
+              child: quill.QuillToolbar.basic(controller: _quillController, )
+            ),
+          );
+        });
   }
 
   @override
@@ -101,22 +93,23 @@ class _ToDoListPageState extends State<ToDoListPage> {
       ),
       body: Column(
         children: [
-            Expanded(
-              child: ListView.builder(
-                itemCount: contentsList.length,
-                itemBuilder: (context, index) {
-                  if(contentsList[index] == 'checkField'){
-                    return CheckField();
-                  }else if(contentsList[index] == 'feedBack'){
-                    return addFeedBack();
-                  } else {
-                    return addTextFormField();
-                  }
-                }
-              )
+          Expanded(
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: 10),
+              child: quill.QuillEditor(
+                controller: _quillController,
+                readOnly: false,
+                focusNode: FocusNode(),
+                scrollController: ScrollController(),
+                scrollable: true,
+                padding: const EdgeInsets.all(5),
+                autoFocus: false,
+                expands: false,
+                placeholder: '할 일을 기록하세요.',
+              ),
             ),
-            if(isKeyboard)
-            keyPadToolbar(),
+          ),
+          if (isKeyboard) keyPadToolbar(),
         ],
       ),
     );
@@ -141,17 +134,18 @@ class Toolitem extends StatelessWidget {
       onTap: onTap,
       child: Container(
         padding: EdgeInsets.all(15),
-        decoration: BoxDecoration(
-          border: Border.all(
-            color: Colors.grey,
-            width: 1
-          )
-        ),
+        decoration:
+            BoxDecoration(border: Border.all(color: Colors.grey, width: 1)),
         child: Row(
           children: [
             icon,
-            SizedBox(width: 15,),
-            Text(text, style: TextStyle(fontSize: 18),),
+            SizedBox(
+              width: 15,
+            ),
+            Text(
+              text,
+              style: TextStyle(fontSize: 18),
+            ),
           ],
         ),
       ),
@@ -159,43 +153,3 @@ class Toolitem extends StatelessWidget {
   }
 }
 
-
-class CheckField extends StatefulWidget {
-  const CheckField({super.key});
-
-  @override
-  State<CheckField> createState() => _CheckFieldState();
-}
-
-class _CheckFieldState extends State<CheckField> {
-  final _controller = TextEditingController();
-  bool isSelected = false;
-
-  @override
-  Widget build(BuildContext context) {
-    return TextFormField(
-        maxLines: null,
-        onFieldSubmitted: (value) => {
-          print('실행중'),
-          contentsList.add('checkField'),
-          setState(() {})
-        },
-        cursorColor: Colors.blue,
-        controller: _controller,
-        textInputAction: TextInputAction.done,
-        decoration: InputDecoration(
-          focusedBorder: InputBorder.none,
-          enabledBorder: InputBorder.none,
-          hintText: '내용을 입력하시오..',
-          prefixIcon: Checkbox(
-              value: isSelected,
-              onChanged: (value) {
-                setState(() {
-                  isSelected = value!;
-                });
-              },
-            ),
-        ),
-      );
-  }
-}
