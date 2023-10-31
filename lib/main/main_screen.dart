@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
-import 'package:to_do_list/main/Calendar/calendar.dart';
-import 'package:to_do_list/main/Timebox/Timebox_screen.dart';
-import 'package:to_do_list/main/phone_lock/phone_lock_screen.dart';
-import 'package:to_do_list/main/setting/setting_screen.dart';
+import 'package:provider/provider.dart';
+import 'package:to_do_list/main/home_screen/home_screen.dart';
+import 'package:to_do_list/main/posting_screen/posting_screen.dart';
+import 'package:to_do_list/main/profile_screen/profile_screen.dart';
+import 'package:to_do_list/provider/main_screen_provider.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -15,44 +16,35 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
-  int _selectedIndex = 0;
+  
+  late Main_screen_provider _main_screen_provider;
 
-  List Screens = [
-    CalendarScreen(),
-
-    TimeboxScreen(),
-    PhoneLockScreen(),
-    SettingScreen(),
+  final List Screens = const [
+    HomeScreen(),
+    PostingScreen(),
+    ProfileScreen()
   ];
 
   @override
   Widget build(BuildContext context) {
+    _main_screen_provider = Provider.of<Main_screen_provider>(context, listen: false);
     return Scaffold(
-      body : SafeArea(
-        child: Screens[_selectedIndex],
-      ), 
-      bottomNavigationBar: Container(
-        color: Colors.blueAccent[700],
-        padding: EdgeInsets.symmetric(vertical: 10),
-        child: GNav(
-          backgroundColor: Colors.blueAccent[700]!,
+      body : Screens[Provider.of<Main_screen_provider>(context).currentIndex], 
+      bottomNavigationBar: GNav(
+          backgroundColor: Colors.blueAccent[100]!,
           color: Colors.white,
-          activeColor: Colors.white,
-          iconSize: 25,
-          tabs: [
-            GButton(icon: Icons.calendar_month, text: 'Calendar',),
-            GButton(icon: Icons.timelapse_sharp, text: 'TimeBox',),
-            GButton(icon: Icons.lock_clock_rounded, text: 'Phone lock',),
-            GButton(icon: Icons.settings, text: 'Setting',),
+          activeColor: Colors.blueAccent[700],
+          iconSize: 25,          
+          tabs: const [
+            GButton(icon: Icons.home, ),
+            GButton(icon: Icons.add),
+            GButton(icon: Icons.person),
           ],
-          selectedIndex: _selectedIndex,
+          selectedIndex: Provider.of<Main_screen_provider>(context).currentIndex,
             onTabChange: (index) {
-              setState(() {
-                _selectedIndex = index;
-              });
+              _main_screen_provider.setCurrentIndex(index);
             },
         ),
-      ),
     );
   }
 }

@@ -7,6 +7,7 @@ import 'package:to_do_list/component/mybutton.dart';
 import 'package:to_do_list/component/square_title.dart';
 import 'package:to_do_list/component/textFormField.dart';
 import 'package:to_do_list/login/signup_screen.dart';
+import 'package:to_do_list/main/home_screen/home_screen.dart';
 import 'package:to_do_list/main/main_screen.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -19,6 +20,7 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+  
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
 
@@ -28,14 +30,16 @@ class _LoginScreenState extends State<LoginScreen> {
 
 
   void onTapLogin() async {
-    showDialog(context: context, builder: (context){
-      return Center(child: CircularProgressIndicator(color: Colors.blue));
-    });
     if(emailController.text.isNotEmpty || passwordController.text.isNotEmpty){
+      showDialog(context: context, builder: (context){
+        return Center(child: CircularProgressIndicator(color: Colors.blue));
+      });
       try {
         UserCredential _credential = await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: emailController.text, password: passwordController.text);
+        Navigator.pop(context);
         Navigator.pushReplacementNamed(context, MainScreen.routeName);
+        
       } on FirebaseAuthException catch(e) {
         MySnackBarMessage.showSnackBar(_scaffoldKey, '아이디 혹은 비밀번호가 잘못됐습니다.');
         passwordController.clear();
@@ -67,6 +71,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   }
 
+  // 
   void SocialLoginDataCheck() async {
     uid = FirebaseAuth.instance.currentUser!.uid;
     DocumentSnapshot document = await FirebaseFirestore.instance.collection('userInformation').doc(uid).get();
@@ -97,10 +102,10 @@ class _LoginScreenState extends State<LoginScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 const Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.start,
                   children: [
-                    Icon(Icons.timer_sharp, color: Colors.white, size: 80,),
-                    Text('GLODEN TIME', style: TextStyle(color: Colors.white, fontSize: 40, fontWeight: FontWeight.bold)),
+                    Icon(Icons.timer_sharp, color: Colors.white, size: 70,),
+                    Text('GLODEN TIME', style: TextStyle(color: Colors.white, fontSize: 38, fontWeight: FontWeight.bold)),
                   ],
                 ),
                 const SizedBox(height: 20,),
@@ -117,6 +122,11 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 const SizedBox(height: 25,),
                 MyButton(text: '로그인', onTap: onTapLogin),
+                // MyButton(text: '로그인', onTap: (){
+                //   // Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
+                //   //   return HomeScreen();
+                //   // }));
+                // }),
                 const SizedBox(height: 20,),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,

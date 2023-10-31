@@ -32,19 +32,18 @@ dependencies:
     sdk: flutter
   firebase_auth: ^4.10.1
   google_nav_bar: ^5.0.6
-  calendar_view: ^1.0.4
   google_sign_in: ^6.1.5
   provider: ^6.0.5
-  syncfusion_flutter_calendar: ^23.1.41
-  
-  
+  file_picker: ^6.0.0
+  pluto_menu_bar: ^3.0.1
+  image_picker: ^1.0.4
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
   firebase_core: ^2.17.0
   cloud_firestore: ^4.9.3
-  flutter_quill: ^7.4.15
+
 
 
 dev_dependencies:
@@ -73,7 +72,7 @@ flutter:
   assets:
     - images/apple.png
     - images/google.png
-
+    - assets/music.mp3
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
 
