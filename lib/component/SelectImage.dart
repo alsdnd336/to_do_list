@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 
 class SelectImage extends StatelessWidget {
   const SelectImage({required this.camera, required this.gallery, super.key});

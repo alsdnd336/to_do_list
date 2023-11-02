@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -15,7 +14,7 @@ import 'package:to_do_list/provider/main_screen_provider.dart';
 import 'package:to_do_list/provider/thumbnail_image_provider.dart';
 
 class DetailsScreen extends StatefulWidget {
-  const DetailsScreen({required this.radioFile ,super.key});
+  const DetailsScreen({required this.radioFile, super.key});
 
   final String radioFile;
 
@@ -43,10 +42,11 @@ class _DetailsScreenState extends State<DetailsScreen> {
     if (_titleController.text.isNotEmpty &&
         _informationContrller.text.isNotEmpty &&
         _thumbnailImageProvider.thumbnailPath != null) {
+      // send data to user information
       await _firestore
-          .collection("userPosting")
-          .doc(FirebaseAuth.instance.currentUser!.uid)
-          .collection(_titleController.text)
+          .collection('userPosting')
+          .doc('userPosting')
+          .collection(FirebaseAuth.instance.currentUser!.uid)
           .doc(_titleController.text)
           .set({
         "title": _titleController.text,
@@ -55,15 +55,32 @@ class _DetailsScreenState extends State<DetailsScreen> {
         "thumbnail": _thumbnailImageProvider.thumbnailPath,
         "uid": FirebaseAuth.instance.currentUser!.uid,
         "time": DateTime.now(),
-        "radioFile" : widget.radioFile,
+        "radioFile": widget.radioFile,
       });
+      sendDataAllPostsField();
       Navigator.popUntil(context, ModalRoute.withName('/main'));
-      MyMessage.showSnackBar(_scaffoldKey, '해당 글을 올렸습니다.');
       // go back first page
       _main_screen_provider.setCurrentIndex(0);
     } else {
       MyMessage.showSnackBar(_scaffoldKey, '빈칸을 모두 채워주세요');
     }
+  }
+
+  // send Data to all Posts field
+  void sendDataAllPostsField() async {
+    // all posts number
+    int docNumber = await _firestore.collection('allPosts').count().get().then((value) {
+      return value.count;
+    });
+    _firestore.collection('allPosts').doc(docNumber.toString()).set({
+      "title": _titleController.text,
+      "information": _informationContrller.text,
+      "topic": _currentTopic,
+      "thumbnail": _thumbnailImageProvider.thumbnailPath,
+      "uid": FirebaseAuth.instance.currentUser!.uid,
+      "time": DateTime.now(),
+      "radioFile": widget.radioFile,
+    });
   }
 
   // image picker
@@ -83,27 +100,12 @@ class _DetailsScreenState extends State<DetailsScreen> {
     }
   }
 
-  Widget topicItem(String text) {
-    return Container(
-      margin: EdgeInsets.symmetric(horizontal: 10),
-      padding: EdgeInsets.all(5),
-      decoration: BoxDecoration(
-        color: Colors.grey[300],
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: Text(text),
-    );
-  }
-
   Widget topicBarWidget() {
     return PlutoMenuBar(
       mode: PlutoMenuBarMode.tap,
-
       itemStyle: const PlutoMenuItemStyle(
         enableSelectedTopMenu: true,
-
       ),
-      
       menus: [
         PlutoMenuItem(
           title: 'IT·컴퓨터',
@@ -141,12 +143,10 @@ class _DetailsScreenState extends State<DetailsScreen> {
 
   void CurrentTopic(String topic) {
     _currentTopic = topic;
-    
   }
 
   @override
   void dispose() {
-
     // return initialization
     _titleController.dispose();
     _informationContrller.dispose();
@@ -160,28 +160,46 @@ class _DetailsScreenState extends State<DetailsScreen> {
     print('hello');
     _thumbnailImageProvider =
         Provider.of<thumbnailImageProvider>(context, listen: false);
-    _main_screen_provider = Provider.of<Main_screen_provider>(context, listen: false);
+    _main_screen_provider =
+        Provider.of<Main_screen_provider>(context, listen: false);
     return ScaffoldMessenger(
       key: _scaffoldKey,
       child: Scaffold(
         appBar: AppBar(
           leading: IconButton(
               onPressed: () {
-                showDialog(context: context, builder: (context){
-                  return AlertDialog(
-                    content: const Text('해당 페이지 나가면 작성하신 내용이 사라집니다.', style: TextStyle(fontSize: 18),),
-                    actionsAlignment: MainAxisAlignment.spaceAround,
-                    actions: [
-                      TextButton(onPressed: (){
-                        Navigator.popUntil(context, ModalRoute.withName('/main'));
-                        
-                      }, child: const Text('나가기', style: TextStyle(color: Colors.red),), ),
-                      TextButton(onPressed: (){
-                        Navigator.pop(context);
-                      }, child: const Text('머무르기', style: TextStyle(color: Colors.blue),), ),
-                    ],
-                  );
-                });
+                showDialog(
+                    context: context,
+                    builder: (context) {
+                      return AlertDialog(
+                        content: const Text(
+                          '해당 페이지 나가면 작성하신 내용이 사라집니다.',
+                          style: TextStyle(fontSize: 18),
+                        ),
+                        actionsAlignment: MainAxisAlignment.spaceAround,
+                        actions: [
+                          TextButton(
+                            onPressed: () {
+                              Navigator.popUntil(
+                                  context, ModalRoute.withName('/main'));
+                            },
+                            child: const Text(
+                              '나가기',
+                              style: TextStyle(color: Colors.red),
+                            ),
+                          ),
+                          TextButton(
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                            child: const Text(
+                              '머무르기',
+                              style: TextStyle(color: Colors.blue),
+                            ),
+                          ),
+                        ],
+                      );
+                    });
               },
               icon: Icon(
                 Icons.arrow_back_ios,
@@ -209,7 +227,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
                 Consumer(
                   builder: (context, value, child) {
                     return Container(
-                        padding: EdgeInsets.all(10),
+                        // padding: EdgeInsets.all(10),
                         width: double.infinity,
                         height: MediaQuery.of(context).size.height / 4,
                         decoration: BoxDecoration(
@@ -218,9 +236,12 @@ class _DetailsScreenState extends State<DetailsScreen> {
                         child: Provider.of<thumbnailImageProvider>(context)
                                     .thumbnailPath !=
                                 null
-                            ? Image.file(File(
-                                Provider.of<thumbnailImageProvider>(context)
-                                    .thumbnailPath!))
+                            ? ClipRRect(
+                              borderRadius: BorderRadius.circular(20),
+                              child: Image.file(File(
+                                  Provider.of<thumbnailImageProvider>(context)
+                                      .thumbnailPath!), fit: BoxFit.cover, ),
+                            )
                             : Selectafile_widget(
                                 fileText: '썸네일을 선택하시오',
                                 onTap: () {
@@ -266,7 +287,6 @@ class _DetailsScreenState extends State<DetailsScreen> {
                         height: 10,
                       ),
                       topicBarWidget()
-
                     ],
                   ),
                 ),

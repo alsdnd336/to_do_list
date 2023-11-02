@@ -123,7 +123,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         Icon(
                           Icons.timer_sharp,
                           color: Colors.white,
-                          size: 80,
+                          size: 60,
                         ),
                         Text('GLODEN TIME',
                             style: TextStyle(

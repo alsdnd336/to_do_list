@@ -9,6 +9,7 @@ import 'package:to_do_list/provider/home_screen_provider.dart';
 import 'package:to_do_list/provider/main_screen_provider.dart';
 import 'package:to_do_list/provider/thumbnail_image_provider.dart';
 import 'package:to_do_list/provider/to_do_list_Provider.dart';
+import 'package:to_do_list/provider/userPosts_provider.dart';
 import 'firebase_options.dart';
 
 void main() async {
@@ -24,7 +25,7 @@ await Firebase.initializeApp(
       ChangeNotifierProvider(create: (BuildContext context) =>  Main_screen_provider()),
       ChangeNotifierProvider(create: (BuildContext context) =>  ToDoListProvider()),
       ChangeNotifierProvider(create: (BuildContext context) =>  HomeProvider()),
-      
+      ChangeNotifierProvider(create: (BuildContext context) =>  UserPosts_Provider()),
     ],
     child : const MyApp()
     ),);

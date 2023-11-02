@@ -7,7 +7,6 @@ import 'package:to_do_list/component/mybutton.dart';
 import 'package:to_do_list/component/square_title.dart';
 import 'package:to_do_list/component/textFormField.dart';
 import 'package:to_do_list/login/signup_screen.dart';
-import 'package:to_do_list/main/home_screen/home_screen.dart';
 import 'package:to_do_list/main/main_screen.dart';
 
 class LoginScreen extends StatefulWidget {
