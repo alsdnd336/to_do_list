@@ -16,10 +16,10 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
   late UserPosts_Provider _userPosts_Provider;
-  late List<Widget> contentsList;
 
   String uid = FirebaseAuth.instance.currentUser!.uid;
   bool serverData = false;
+  List userPosts = [];
 
   // Displaying User Information
   Widget profileWidget() {
@@ -43,91 +43,97 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  void contentsWidget() {
-    if(Provider.of<UserPosts_Provider>(context).userPosts.length != 0){
-      List.generate(Provider.of<UserPosts_Provider>(context).userPosts.length, (index) {
-        contentsList.add(PostingWidget(jsonData: Provider.of<UserPosts_Provider>(context).userPosts[index]));
-      }); 
-    }else {
-      contentsList.add(Center(child: Text('게시물이 없습니다'),));
-    }
-    // return const Center(child: Text('게시물이 없습니다'),);
+  void settingDialog() {
+    showDialog(
+      context: context,
+      builder: (context){
+        return Dialog(
+          elevation: 0,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Container(
+            
+            width: MediaQuery.of(context).size.width - 50,
+            height: MediaQuery.of(context).size.height / 5,
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                settingItem(const Text('프로필 수정', style: TextStyle(fontSize: 20),) , () {}),
+                settingItem(const Text('로그아웃', style: TextStyle(fontSize: 20, color: Colors.red)), (){})
+              ],
+            ),
+          ),
+        );
+      }
+    );
+  }
+
+  Widget settingItem(Text contents, Function() onTap) {
+    return InkWell(
+      onTap: onTap,
+      child: Container(
+        padding: EdgeInsets.symmetric(vertical: 15),
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.grey),
+          borderRadius: BorderRadius.circular(5)
+        ),
+        child: Center(
+          child: contents,
+        ),
+      )
+    );
   }
 
   @override
   void didChangeDependencies() {
     _userPosts_Provider = Provider.of<UserPosts_Provider>(context, listen: false);
-    _userPosts_Provider.importData(uid);
-    contentsWidget();
     super.didChangeDependencies();
   }
 
 
   @override
   Widget build(BuildContext context) {
-    // return Container(
-    //   height: MediaQuery.of(context).size.height,
-    //   child: Column(
-    //     children: [
-    //       Container(
-    //         width: double.infinity,
-    //         height: 50,
-    //         color: Colors.blueAccent[100],
-    //         child: Row(
-    //           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-    //           children: [
-    //             Text('User Name', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 25),),
-    //             IconButton(
-    //               onPressed: (){
-    //                 setState(() {});
-    //               },
-    //               icon: const Icon(Icons.settings, color: Colors.white, size: 30,),
-    //             ),
-    //           ],
-    //         ),
-    //       )
-    //     ],
-    //   )
-    // );
-    return CustomScrollView(
-      slivers: [
-        SliverAppBar(
-          centerTitle: false,
-          backgroundColor: Colors.blueAccent[100],
-          title: const Text('User Name', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 25),),
-          actions: [
-            IconButton(
-              onPressed: (){
-                setState(() {});
-              },
-              icon: const Icon(Icons.settings, color: Colors.white, size: 30,),
-            ),
-          ],
-        ),
-        SliverToBoxAdapter(
-          child: profileWidget(),
-        ),
-        const SliverToBoxAdapter(
-          child:  Divider(thickness: 1, color: Colors.grey,),
-        ),
-        SliverToBoxAdapter(
-          child: Column(
-            children: contentsList,
-          )
-        ),
-        // SliverList(
-        //   delegate: SliverChildBuilderDelegate(
-          
-        //         (context, index) {
-        //       if(index < Provider.of<UserPosts_Provider>(context).userPosts.length){
-        //         return PostingWidget(jsonData: Provider.of<UserPosts_Provider>(context).userPosts[index]);
-        //       }
-        //     },
-        //     childCount: Provider.of<UserPosts_Provider>(context).userPosts.length,
+    return FutureBuilder(
+      future: _userPosts_Provider.importData(uid),
+      builder: (context, snapshot) {
+        if(snapshot.connectionState == ConnectionState.done) {
+          return CustomScrollView(
+            slivers: [
+              SliverAppBar(
+                centerTitle: false,
+                backgroundColor: Colors.blueAccent[100],
+                title: const Text('User Name', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 25),),
+                actions: [
+                  IconButton(
+                    onPressed: settingDialog,
+                    icon: const Icon(Icons.settings, color: Colors.white, size: 30,),
+                  ),
+                ],
+              ),
+              SliverToBoxAdapter(
+                child: profileWidget(),
+              ),
+              const SliverToBoxAdapter(
+                child:  Divider(thickness: 1, color: Colors.grey,),
+              ),
+              SliverList(
+                delegate: SliverChildBuilderDelegate(
+                  (context, index) {
+                    return PostingWidget(jsonData: Provider.of<UserPosts_Provider>(context).userPosts[index]);
+                  },
+                  childCount: Provider.of<UserPosts_Provider>(context).userPosts.length,
+                ),
+              ),
+            ],
+          );
+        } else {
+          return const Center(child: CircularProgressIndicator(),);
+        }
+      },
 
-        //   ),
-        // )
-      ],
     );
   }
 }

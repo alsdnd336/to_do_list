@@ -29,7 +29,7 @@ class PostingWidget extends StatelessWidget {
                 radius: 20,
               ),
               const SizedBox(width: 10,),
-              Text(jsonData['title']),
+              Text(jsonData['title'], style: TextStyle(color: Colors.black, fontSize: 20, fontWeight: FontWeight.bold),),
             ],
           ),
         ],
