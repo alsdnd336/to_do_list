@@ -27,7 +27,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
       "id" : emailController.text,
       "name" : nameController.text,
       "uid" : uid,
-      "password" : passwordController.text
+      "password" : passwordController.text,
+      "userProfile" : '',
+      'userInformation' : '',
     });
   }
 
@@ -46,12 +48,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
             });
         try {
           UserCredential _credential = await FirebaseAuth.instance
-              .createUserWithEmailAndPassword(
-                  email: emailController.text,
-                  password: passwordController.text);
+            .createUserWithEmailAndPassword(
+                email: emailController.text,
+                password: passwordController.text);
           uid = FirebaseAuth.instance.currentUser!.uid;
           userInformation();
-          Navigator.pushReplacementNamed(context, MainScreen.routeName);
+          Navigator.pushNamedAndRemoveUntil(context, MainScreen.routeName, (route) => false);
+          // Navigator.pushReplacementNamed(context, MainScreen.routeName);
         } on FirebaseAuthException catch (e) {
           if (e.code == "email-already-in-use") {
             MySnackBarMessage.showSnackBar(

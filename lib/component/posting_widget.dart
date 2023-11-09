@@ -1,4 +1,4 @@
-import 'dart:convert';
+
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -25,11 +25,18 @@ class PostingWidget extends StatelessWidget {
           Row(
             children: [
               CircleAvatar(
+                backgroundImage: jsonData['userProfile'] == '' ? const AssetImage('images/profile_basic_image.png') : FileImage(File(jsonData['userProfile'])) as ImageProvider ,
                 backgroundColor: Colors.grey,
                 radius: 20,
               ),
               const SizedBox(width: 10,),
-              Text(jsonData['title'], style: TextStyle(color: Colors.black, fontSize: 20, fontWeight: FontWeight.bold),),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(jsonData['title'], style: const TextStyle(color: Colors.black, fontSize: 20, fontWeight: FontWeight.bold),),
+                  Text(jsonData['userName'], style: const TextStyle(color: Colors.grey, fontSize: 13),)
+                ],
+              ),
             ],
           ),
         ],

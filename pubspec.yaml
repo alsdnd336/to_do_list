@@ -73,6 +73,7 @@ flutter:
     - images/apple.png
     - images/google.png
     - assets/music.mp3
+    - images/profile_basic_image.png
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
 

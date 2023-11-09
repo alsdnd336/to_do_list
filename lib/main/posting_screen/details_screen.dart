@@ -28,8 +28,13 @@ class _DetailsScreenState extends State<DetailsScreen> {
   final _scaffoldKey = GlobalKey<ScaffoldMessengerState>();
   FirebaseAuth instance = FirebaseAuth.instance;
 
+
   //fire base
   FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  CollectionReference users = FirebaseFirestore.instance.collection('userInformation');
+  final currentUser = FirebaseAuth.instance.currentUser!;
+  late String userName;
+  late String userProfile;
 
   String _currentTopic = 'IT·컴퓨터';
 
@@ -37,25 +42,31 @@ class _DetailsScreenState extends State<DetailsScreen> {
   late thumbnailImageProvider _thumbnailImageProvider;
   late Main_screen_provider _main_screen_provider;
 
+
+
   // send data to the server
   void sendDataServer() async {
     if (_titleController.text.isNotEmpty &&
         _informationContrller.text.isNotEmpty &&
         _thumbnailImageProvider.thumbnailPath != null) {
+
+          // get a user information
       // send data to user information
       await _firestore
           .collection('userPosting')
           .doc('userPosting')
-          .collection(FirebaseAuth.instance.currentUser!.uid)
+          .collection(currentUser.uid)
           .doc(_titleController.text)
           .set({
         "title": _titleController.text,
         "information": _informationContrller.text,
         "topic": _currentTopic,
         "thumbnail": _thumbnailImageProvider.thumbnailPath,
-        "uid": FirebaseAuth.instance.currentUser!.uid,
+        "uid": currentUser.uid,
         "time": DateTime.now(),
         "radioFile": widget.radioFile,
+        'userProfile' : userProfile,
+        "userName" : userName,
       });
       sendDataAllPostsField();
       Navigator.popUntil(context, ModalRoute.withName('/main'));
@@ -156,8 +167,17 @@ class _DetailsScreenState extends State<DetailsScreen> {
   }
 
   @override
+  void initState() {
+    users.doc(currentUser.uid).get().then((value) {
+      final jsonData = value.data() as Map<String, dynamic>;
+      userName = jsonData['name'];
+      userProfile = jsonData['userProfile'];
+    });
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    print('hello');
     _thumbnailImageProvider =
         Provider.of<thumbnailImageProvider>(context, listen: false);
     _main_screen_provider =
@@ -236,11 +256,23 @@ class _DetailsScreenState extends State<DetailsScreen> {
                         child: Provider.of<thumbnailImageProvider>(context)
                                     .thumbnailPath !=
                                 null
-                            ? ClipRRect(
-                              borderRadius: BorderRadius.circular(20),
-                              child: Image.file(File(
-                                  Provider.of<thumbnailImageProvider>(context)
-                                      .thumbnailPath!), fit: BoxFit.cover, ),
+                            ? InkWell(
+                              onTap: (){
+                                showModalBottomSheet(
+                                      context: context,
+                                      builder: (BuildContext context) {
+                                        return SelectImage(
+                                          camera: _pickCamera,
+                                          gallery: _pickGallery,
+                                        );
+                                      });
+                              },
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(20),
+                                child: Image.file(File(
+                                    Provider.of<thumbnailImageProvider>(context)
+                                        .thumbnailPath!), fit: BoxFit.cover, ),
+                              ),
                             )
                             : Selectafile_widget(
                                 fileText: '썸네일을 선택하시오',

@@ -36,7 +36,7 @@ class _MainScreenState extends State<MainScreen> {
           activeColor: Colors.blueAccent[700],
           iconSize: 25,          
           tabs: const [
-            GButton(icon: Icons.home, ),
+            GButton(icon: Icons.home,),
             GButton(icon: Icons.add),
             GButton(icon: Icons.person),
           ],

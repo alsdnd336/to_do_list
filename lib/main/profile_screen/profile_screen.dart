@@ -1,10 +1,13 @@
-import 'dart:async';
+import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:to_do_list/component/posting_widget.dart';
+import 'package:to_do_list/main/profile_screen/profile_adjustment.dart';
+import 'package:to_do_list/provider/home_screen_provider.dart';
+import 'package:to_do_list/provider/main_screen_provider.dart';
 import 'package:to_do_list/provider/userPosts_provider.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -16,10 +19,15 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
   late UserPosts_Provider _userPosts_Provider;
+  late Main_screen_provider _main_screen_provider;
 
   String uid = FirebaseAuth.instance.currentUser!.uid;
   bool serverData = false;
   List userPosts = [];
+
+  late String userName;
+  late String userProfile;
+  late String userInformation;
 
   // Displaying User Information
   Widget profileWidget() {
@@ -28,19 +36,27 @@ class _ProfileScreenState extends State<ProfileScreen> {
       child: Row(
         children: [
           CircleAvatar(
+            backgroundImage: userProfile == '' ? const AssetImage('images/profile_basic_image.png') : FileImage(File(userProfile)) as ImageProvider ,
             backgroundColor: Colors.grey,
             radius: MediaQuery.of(context).size.width / 7,
           ),
           const SizedBox(width: 20,),
           Column(
+
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('User information', style: const TextStyle(fontSize: 15),),
+              Text(userInformation == '' ? '소개글이 없습니다.' : userInformation , style: const TextStyle(fontSize: 15),),
             ],
           ),
         ],
       ),
     );
+  }
+
+  void logOut() async {
+    await FirebaseAuth.instance.signOut();
+    Navigator.pushNamedAndRemoveUntil(context, '/', (route) => false);
+    _main_screen_provider.setCurrentIndex(0);
   }
 
   void settingDialog() {
@@ -53,16 +69,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
             borderRadius: BorderRadius.circular(20),
           ),
           child: Container(
-            
             width: MediaQuery.of(context).size.width - 50,
             height: MediaQuery.of(context).size.height / 5,
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-            
             child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                settingItem(const Text('프로필 수정', style: TextStyle(fontSize: 20),) , () {}),
-                settingItem(const Text('로그아웃', style: TextStyle(fontSize: 20, color: Colors.red)), (){})
+                settingItem(const Text('프로필 수정', style: TextStyle(fontSize: 20),) , () {
+                  Navigator.pop(context);
+                  Navigator.push(context, MaterialPageRoute(builder: (context){
+                    return ProfileAdjustment(userProfile: userProfile, userName: userName, userInformation: userInformation,);
+                  }));
+                }),
+                settingItem(const Text('로그아웃', style: TextStyle(fontSize: 20, color: Colors.red)), logOut)
               ],
             ),
           ),
@@ -87,9 +106,24 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
+
+  @override
+  void initState() {
+    // get a user Information
+    FirebaseFirestore.instance.collection('userInformation').doc(uid).get().then((value) {
+      final jsonData = value.data() as Map<String, dynamic>;
+      userName = jsonData['name'];
+      userProfile = jsonData['userProfile'];
+      userInformation = jsonData['userInformation'];
+      print(userName);
+    });
+    super.initState();
+  }
+
   @override
   void didChangeDependencies() {
     _userPosts_Provider = Provider.of<UserPosts_Provider>(context, listen: false);
+    _main_screen_provider = Provider.of<Main_screen_provider>(context, listen: false);
     super.didChangeDependencies();
   }
 
@@ -105,7 +139,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               SliverAppBar(
                 centerTitle: false,
                 backgroundColor: Colors.blueAccent[100],
-                title: const Text('User Name', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 25),),
+                title: Text(userName , style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 25),),
                 actions: [
                   IconButton(
                     onPressed: settingDialog,
@@ -118,6 +152,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
               const SliverToBoxAdapter(
                 child:  Divider(thickness: 1, color: Colors.grey,),
+              ),
+              if(Provider.of<UserPosts_Provider>(context).userPosts.isEmpty)
+              const SliverToBoxAdapter(
+                child: Center(
+                  child: Text('게시물이 없습니다.', style: TextStyle(fontSize: 20, color: Colors.black54),),
+                ),
               ),
               SliverList(
                 delegate: SliverChildBuilderDelegate(

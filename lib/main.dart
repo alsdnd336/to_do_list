@@ -50,8 +50,7 @@ class MyApp extends StatelessWidget {
           MainScreen.routeName: (context) => const MainScreen(),
           PostingScreen.routeName: (context) => const PostingScreen(),
           
-        },
-    
+      },
     );
   }
 }
