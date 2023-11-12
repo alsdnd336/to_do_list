@@ -42,7 +42,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
           const SizedBox(width: 20,),
           Column(
-
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(userInformation == '' ? '소개글이 없습니다.' : userInformation , style: const TextStyle(fontSize: 15),),

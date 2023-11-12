@@ -10,7 +10,9 @@ class UserPosts_Provider extends ChangeNotifier {
     // initalized 
     userPosts = [];
     await FirebaseFirestore.instance.collection('userPosting').doc('userPosting').collection(uid).get().then((value) {
+      print(value.docs.length);
       value.docs.forEach((element) {
+
         userPosts.add(element.data());
       });
     });

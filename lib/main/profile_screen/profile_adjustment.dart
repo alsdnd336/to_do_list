@@ -66,7 +66,7 @@ class _ProfileAdjustmentState extends State<ProfileAdjustment> {
       setState(() {
         userProfile = image.path;
       });
-      Navigator.pop(context);
+      Navigator.pop(context); 
     }
   }
 

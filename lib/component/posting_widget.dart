@@ -1,4 +1,4 @@
-
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -31,7 +31,6 @@ class PostingWidget extends StatelessWidget {
               ),
               const SizedBox(width: 10,),
               Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(jsonData['title'], style: const TextStyle(color: Colors.black, fontSize: 20, fontWeight: FontWeight.bold),),
                   Text(jsonData['userName'], style: const TextStyle(color: Colors.grey, fontSize: 13),)

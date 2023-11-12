@@ -8,7 +8,6 @@ import 'package:to_do_list/main/posting_screen/posting_screen.dart';
 import 'package:to_do_list/provider/home_screen_provider.dart';
 import 'package:to_do_list/provider/main_screen_provider.dart';
 import 'package:to_do_list/provider/thumbnail_image_provider.dart';
-import 'package:to_do_list/provider/to_do_list_Provider.dart';
 import 'package:to_do_list/provider/userPosts_provider.dart';
 import 'firebase_options.dart';
 
@@ -20,10 +19,8 @@ await Firebase.initializeApp(
   runApp(
     MultiProvider(
     providers: [
-      ChangeNotifierProvider(create: (BuildContext context) =>  ToDoListProvider()),
       ChangeNotifierProvider(create: (BuildContext context) =>  thumbnailImageProvider()),
       ChangeNotifierProvider(create: (BuildContext context) =>  Main_screen_provider()),
-      ChangeNotifierProvider(create: (BuildContext context) =>  ToDoListProvider()),
       ChangeNotifierProvider(create: (BuildContext context) =>  HomeProvider()),
       ChangeNotifierProvider(create: (BuildContext context) =>  UserPosts_Provider()),
     ],
@@ -48,8 +45,7 @@ class MyApp extends StatelessWidget {
         routes: {
           LoginScreen.routeName: (context) => const LoginScreen(),
           MainScreen.routeName: (context) => const MainScreen(),
-          PostingScreen.routeName: (context) => const PostingScreen(),
-          
+          PostingScreen.routeName: (context) => const PostingScreen(),  
       },
     );
   }

@@ -28,7 +28,6 @@ class _DetailsScreenState extends State<DetailsScreen> {
   final _scaffoldKey = GlobalKey<ScaffoldMessengerState>();
   FirebaseAuth instance = FirebaseAuth.instance;
 
-
   //fire base
   FirebaseFirestore _firestore = FirebaseFirestore.instance;
   CollectionReference users = FirebaseFirestore.instance.collection('userInformation');
@@ -43,6 +42,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
   late Main_screen_provider _main_screen_provider;
 
 
+  // firebase storage function
 
   // send data to the server
   void sendDataServer() async {
@@ -80,7 +80,7 @@ class _DetailsScreenState extends State<DetailsScreen> {
   // send Data to all Posts field
   void sendDataAllPostsField() async {
     // all posts number
-    int docNumber = await _firestore.collection('allPosts').count().get().then((value) {
+    int docNumber = await _firestore.collection('allPosts').count().get().then((  value) {
       return value.count;
     });
     _firestore.collection('allPosts').doc(docNumber.toString()).set({
@@ -91,6 +91,8 @@ class _DetailsScreenState extends State<DetailsScreen> {
       "uid": FirebaseAuth.instance.currentUser!.uid,
       "time": DateTime.now(),
       "radioFile": widget.radioFile,
+      'userProfile' : userProfile,
+      "userName" : userName,
     });
   }
 
