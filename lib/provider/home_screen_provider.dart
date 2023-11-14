@@ -14,7 +14,6 @@ class HomeProvider extends ChangeNotifier{
         userPosts.add(element.data());
       });
     });
-    
     notifyListeners();
   }
 }

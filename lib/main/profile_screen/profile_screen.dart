@@ -28,6 +28,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   late String userName;
   late String userProfile;
   late String userInformation;
+  late String userImagePath;
 
   // Displaying User Information
   Widget profileWidget() {
@@ -36,7 +37,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       child: Row(
         children: [
           CircleAvatar(
-            backgroundImage: userProfile == '' ? const AssetImage('images/profile_basic_image.png') : FileImage(File(userProfile)) as ImageProvider ,
+            backgroundImage: userProfile == '' ? const AssetImage('images/profile_basic_image.png') : NetworkImage(userProfile) as ImageProvider ,
             backgroundColor: Colors.grey,
             radius: MediaQuery.of(context).size.width / 7,
           ),
@@ -77,7 +78,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 settingItem(const Text('프로필 수정', style: TextStyle(fontSize: 20),) , () {
                   Navigator.pop(context);
                   Navigator.push(context, MaterialPageRoute(builder: (context){
-                    return ProfileAdjustment(userProfile: userProfile, userName: userName, userInformation: userInformation,);
+                    return ProfileAdjustment(userProfile: userImagePath, userName: userName, userInformation: userInformation,);
                   }));
                 }),
                 settingItem(const Text('로그아웃', style: TextStyle(fontSize: 20, color: Colors.red)), logOut)
@@ -114,7 +115,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       userName = jsonData['name'];
       userProfile = jsonData['userProfile'];
       userInformation = jsonData['userInformation'];
-      print(userName);
+      userImagePath = jsonData['imagePath'];
     });
     super.initState();
   }

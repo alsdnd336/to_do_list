@@ -30,6 +30,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
       "password" : passwordController.text,
       "userProfile" : '',
       'userInformation' : '',
+      "imagePath" : '',
     });
   }
 

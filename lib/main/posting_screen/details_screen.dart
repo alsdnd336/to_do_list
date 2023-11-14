@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
@@ -34,8 +35,10 @@ class _DetailsScreenState extends State<DetailsScreen> {
   final currentUser = FirebaseAuth.instance.currentUser!;
   late String userName;
   late String userProfile;
+  FirebaseStorage _storage = FirebaseStorage.instance;
 
   String _currentTopic = 'IT·컴퓨터';
+  String thumbnailUrl = '';
 
   // thumbnail provider
   late thumbnailImageProvider _thumbnailImageProvider;
@@ -50,6 +53,16 @@ class _DetailsScreenState extends State<DetailsScreen> {
         _informationContrller.text.isNotEmpty &&
         _thumbnailImageProvider.thumbnailPath != null) {
 
+      // allPosts Number
+      int docNumber = await _firestore.collection('allPosts').count().get().then((  value) {
+        return value.count;
+      });
+
+      // loading dialog
+      showDialog(context: context, builder: (context) {
+        return Center(child: CircularProgressIndicator(color: Colors.blue),);
+      });
+      await dataToStorage();
           // get a user information
       // send data to user information
       await _firestore
@@ -58,17 +71,19 @@ class _DetailsScreenState extends State<DetailsScreen> {
           .collection(currentUser.uid)
           .doc(_titleController.text)
           .set({
+        "postId" : docNumber.toString(),
         "title": _titleController.text,
         "information": _informationContrller.text,
         "topic": _currentTopic,
-        "thumbnail": _thumbnailImageProvider.thumbnailPath,
+        "thumbnail": thumbnailUrl,
         "uid": currentUser.uid,
         "time": DateTime.now(),
         "radioFile": widget.radioFile,
         'userProfile' : userProfile,
         "userName" : userName,
+        "Likes" : [],
       });
-      sendDataAllPostsField();
+      sendDataAllPostsField(docNumber);
       Navigator.popUntil(context, ModalRoute.withName('/main'));
       // go back first page
       _main_screen_provider.setCurrentIndex(0);
@@ -77,22 +92,29 @@ class _DetailsScreenState extends State<DetailsScreen> {
     }
   }
 
+  Future<void> dataToStorage() async {
+    Reference _ref = _storage.ref().child(_thumbnailImageProvider.thumbnailPath!);
+    await _ref.putFile(File(_thumbnailImageProvider.thumbnailPath!));
+
+    thumbnailUrl = await _ref.getDownloadURL();
+  }
+
   // send Data to all Posts field
-  void sendDataAllPostsField() async {
+  void sendDataAllPostsField(int docNumber) async {
     // all posts number
-    int docNumber = await _firestore.collection('allPosts').count().get().then((  value) {
-      return value.count;
-    });
+    
     _firestore.collection('allPosts').doc(docNumber.toString()).set({
+      'postId' : docNumber.toString(),
       "title": _titleController.text,
       "information": _informationContrller.text,
       "topic": _currentTopic,
-      "thumbnail": _thumbnailImageProvider.thumbnailPath,
+      "thumbnail": thumbnailUrl,
       "uid": FirebaseAuth.instance.currentUser!.uid,
       "time": DateTime.now(),
       "radioFile": widget.radioFile,
       'userProfile' : userProfile,
       "userName" : userName,
+      "Likes" : [],
     });
   }
 

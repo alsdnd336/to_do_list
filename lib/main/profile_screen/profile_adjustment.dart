@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:to_do_list/component/SelectImage.dart';
@@ -34,6 +35,10 @@ class _ProfileAdjustmentState extends State<ProfileAdjustment> {
   final uid = FirebaseAuth.instance.currentUser!.uid;
   late String userProfile;
 
+  FirebaseStorage _storage = FirebaseStorage.instance;
+  String profileUrl = '';
+
+
   // change 
   void DataUpdate() async {
     if (userNameController.text == widget.userName &&
@@ -41,12 +46,19 @@ class _ProfileAdjustmentState extends State<ProfileAdjustment> {
         userProfile == widget.userProfile) {
         MySnackBarMessage.showSnackBar(_scaffoldKey, '변경사항이 없습니다.');
     } else {
+      // loading 
+      showDialog(context: context, builder: (context){
+        return const Center(child: CircularProgressIndicator(color: Colors.blue));
+      });
+
       DocumentReference userDocRef = FirebaseFirestore.instance.collection('userInformation').doc(uid);
       // update data
+      await dataToStorage();
       Map<String, dynamic> dataToUpdate = {
         'name' : userNameController.text,
         'userInformation' : userInformationController.text,
-        'userProfile' : userProfile,
+        'userProfile' : profileUrl,
+        'imagePath' : userProfile, 
       };
 
       try {
@@ -58,6 +70,13 @@ class _ProfileAdjustmentState extends State<ProfileAdjustment> {
       }
     }
 
+  }
+
+  Future<void> dataToStorage() async {
+    Reference _ref = _storage.ref().child(userProfile);
+    await _ref.putFile(File(userProfile));
+
+    profileUrl = await _ref.getDownloadURL();
   }
 
   Future<void> _pickCamera() async {
