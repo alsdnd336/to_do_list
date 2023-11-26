@@ -7,7 +7,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:to_do_list/component/SelectImage.dart';
 import 'package:to_do_list/component/filedragWidget.dart';
-import 'package:to_do_list/component/mySnackbar.dart';
+import 'package:to_do_list/component/myShowSnackbar.dart';
 import 'package:to_do_list/component/mybutton.dart';
 import 'package:to_do_list/component/textFormField.dart';
 import 'package:pluto_menu_bar/pluto_menu_bar.dart';
@@ -15,9 +15,9 @@ import 'package:to_do_list/provider/main_screen_provider.dart';
 import 'package:to_do_list/provider/thumbnail_image_provider.dart';
 
 class DetailsScreen extends StatefulWidget {
-  const DetailsScreen({required this.radioFile, super.key});
+  const DetailsScreen({required this.audioFile, super.key});
 
-  final String radioFile;
+  final String audioFile;
 
   @override
   State<DetailsScreen> createState() => _DetailsScreenState();
@@ -37,15 +37,17 @@ class _DetailsScreenState extends State<DetailsScreen> {
   late String userProfile;
   FirebaseStorage _storage = FirebaseStorage.instance;
 
+
   String _currentTopic = 'IT·컴퓨터';
   String thumbnailUrl = '';
+
+  // mp3 file url
+  String audilFileUrl = '';
+
 
   // thumbnail provider
   late thumbnailImageProvider _thumbnailImageProvider;
   late Main_screen_provider _main_screen_provider;
-
-
-  // firebase storage function
 
   // send data to the server
   void sendDataServer() async {
@@ -62,48 +64,12 @@ class _DetailsScreenState extends State<DetailsScreen> {
       showDialog(context: context, builder: (context) {
         return Center(child: CircularProgressIndicator(color: Colors.blue),);
       });
-      await dataToStorage();
-          // get a user information
-      // send data to user information
-      await _firestore
-          .collection('userPosting')
-          .doc('userPosting')
-          .collection(currentUser.uid)
-          .doc(_titleController.text)
-          .set({
-        "postId" : docNumber.toString(),
-        "title": _titleController.text,
-        "information": _informationContrller.text,
-        "topic": _currentTopic,
-        "thumbnail": thumbnailUrl,
-        "uid": currentUser.uid,
-        "time": DateTime.now(),
-        "radioFile": widget.radioFile,
-        'userProfile' : userProfile,
-        "userName" : userName,
-        "Likes" : [],
-      });
-      sendDataAllPostsField(docNumber);
-      Navigator.popUntil(context, ModalRoute.withName('/main'));
-      // go back first page
-      _main_screen_provider.setCurrentIndex(0);
-    } else {
-      MyMessage.showSnackBar(_scaffoldKey, '빈칸을 모두 채워주세요');
-    }
-  }
-
-  Future<void> dataToStorage() async {
-    Reference _ref = _storage.ref().child(_thumbnailImageProvider.thumbnailPath!);
-    await _ref.putFile(File(_thumbnailImageProvider.thumbnailPath!));
-
-    thumbnailUrl = await _ref.getDownloadURL();
-  }
-
-  // send Data to all Posts field
-  void sendDataAllPostsField(int docNumber) async {
-    // all posts number
-    
-    _firestore.collection('allPosts').doc(docNumber.toString()).set({
+      // save thumbnail image to storage
+      await dataToThumbnailStorage();
+      // save audioFile to storage
+      await dataToAudioStorage();
+      // save data to allPosts collection
+      _firestore.collection('allPosts').doc(docNumber.toString()).set({
       'postId' : docNumber.toString(),
       "title": _titleController.text,
       "information": _informationContrller.text,
@@ -111,11 +77,31 @@ class _DetailsScreenState extends State<DetailsScreen> {
       "thumbnail": thumbnailUrl,
       "uid": FirebaseAuth.instance.currentUser!.uid,
       "time": DateTime.now(),
-      "radioFile": widget.radioFile,
+      "audioFile": audilFileUrl,
       'userProfile' : userProfile,
       "userName" : userName,
       "Likes" : [],
     });
+      Navigator.popUntil(context, ModalRoute.withName('/main'));
+      // go back first page
+      _main_screen_provider.setCurrentIndex(0);
+    } else {
+      MySnackBarMessage.showSnackBar(_scaffoldKey, '빈칸을 모두 채워주세요');
+    }
+  }
+
+  Future<void> dataToAudioStorage() async {
+    Reference _ref = _storage.ref().child(widget.audioFile);
+    await _ref.putFile(File(widget.audioFile));
+
+    audilFileUrl = await _ref.getDownloadURL();
+  }
+
+  Future<void> dataToThumbnailStorage() async {
+    Reference _ref = _storage.ref().child(_thumbnailImageProvider.thumbnailPath!);
+    await _ref.putFile(File(_thumbnailImageProvider.thumbnailPath!));
+
+    thumbnailUrl = await _ref.getDownloadURL();
   }
 
   // image picker
@@ -264,7 +250,9 @@ class _DetailsScreenState extends State<DetailsScreen> {
                 MyTestFormField(
                     controller: _titleController,
                     hintText: '제목을 입력하시오',
-                    obscureTextState: false),
+                    obscureTextState: false,
+                      maxLength : 40,
+                    ),
                 const SizedBox(
                   height: 20,
                 ),
@@ -319,7 +307,10 @@ class _DetailsScreenState extends State<DetailsScreen> {
                 MyTestFormField(
                     controller: _informationContrller,
                     hintText: '소개글을 입력하시오',
-                    obscureTextState: false),
+                    obscureTextState: false,
+                    maxLength : null,
+                    ),
+                    
                 const SizedBox(
                   height: 20,
                 ),

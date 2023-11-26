@@ -94,61 +94,63 @@ class _LoginScreenState extends State<LoginScreen> {
       key: _scaffoldKey,
       child: Scaffold(
         body: Container(
-          padding: EdgeInsets.symmetric(horizontal: 20),
           color: Colors.blueAccent[100],
-          child: SafeArea(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Icon(Icons.timer_sharp, color: Colors.white, size: 70,),
-                    Text('GLODEN TIME', style: TextStyle(color: Colors.white, fontSize: 38, fontWeight: FontWeight.bold)),
-                  ],
-                ),
-                const SizedBox(height: 20,),
-                MyTestFormField(
-                  obscureTextState: false,
-                  controller: emailController,
-                  hintText: '이메일',
-                ),
-                const SizedBox(height: 10,),
-                MyTestFormField(
-                  obscureTextState: true,
-                  controller: passwordController,
-                  hintText: '비밀번호',
-                ),
-                const SizedBox(height: 25,),
-                MyButton(text: '로그인', onTap: onTapLogin),
-                // MyButton(text: '로그인', onTap: (){
-                //   // Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
-                //   //   return HomeScreen();
-                //   // }));
-                // }),
-                const SizedBox(height: 20,),
-                Row(
+          child: SingleChildScrollView(
+            child: Container(
+              height: MediaQuery.of(context).size.height,
+              padding: EdgeInsets.symmetric(horizontal: 20),
+              child: SafeArea(
+                child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    SquareTitle(imagePath: 'images/google.png', onTap: googleLogin),
-                    const SizedBox(width: 25,),
-                    SquareTitle(imagePath: 'images/apple.png', onTap: appleLogin,),
+                    const Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Icon(Icons.timer_sharp, color: Colors.white, size: 70,),
+                        Text('GLODEN TIME', style: TextStyle(color: Colors.white, fontSize: 38, fontWeight: FontWeight.bold)),
+                      ],
+                    ),
+                    const SizedBox(height: 20,),
+                    MyTestFormField(
+                      obscureTextState: false,
+                      controller: emailController,
+                      maxLength : null,
+                      hintText: '이메일',
+                    ),
+                    const SizedBox(height: 10,),
+                    MyTestFormField(
+                      obscureTextState: true,
+                      controller: passwordController,
+                      hintText: '비밀번호',
+                      maxLength : null,
+                    ),
+                    const SizedBox(height: 25,),
+                    MyButton(text: '로그인', onTap: onTapLogin),
+                    const SizedBox(height: 20,),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        SquareTitle(imagePath: 'images/google.png', onTap: googleLogin),
+                        const SizedBox(width: 25,),
+                        SquareTitle(imagePath: 'images/apple.png', onTap: appleLogin,),
+                      ],
+                    ),
+                    const SizedBox(height: 10,),
+                    const Divider(color: Colors.white, thickness: 1,),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        TextButton(onPressed: (){}, child: Text('비밀번호 찾기', style: TextStyle(color: Colors.white, fontSize: 17),)),
+                        TextButton(onPressed: (){
+                          Navigator.push(context, MaterialPageRoute(builder: (context) {
+                            return SignUpScreen();
+                          }));
+                        }, child: Text('회원가입', style: TextStyle(color: Colors.white, fontSize: 17),))
+                      ],
+                    )
                   ],
                 ),
-                const SizedBox(height: 10,),
-                const Divider(color: Colors.white, thickness: 1,),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    TextButton(onPressed: (){}, child: Text('비밀번호 찾기', style: TextStyle(color: Colors.white, fontSize: 17),)),
-                    TextButton(onPressed: (){
-                      Navigator.push(context, MaterialPageRoute(builder: (context) {
-                        return SignUpScreen();
-                      }));
-                    }, child: Text('회원가입', style: TextStyle(color: Colors.white, fontSize: 17),))
-                  ],
-                )
-              ],
+              ),
             ),
           ),
         ),

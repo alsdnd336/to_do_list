@@ -143,6 +143,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       obscureTextState: false,
                       controller: nameController,
                       hintText: '이름',
+                      maxLength: 20,
                     ),
                     const SizedBox(
                       height: 10,
@@ -151,6 +152,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       obscureTextState: false,
                       controller: emailController,
                       hintText: '이메일',
+                      maxLength : null,
                     ),
                     const SizedBox(
                       height: 10,
@@ -159,6 +161,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       obscureTextState: true,
                       controller: passwordController,
                       hintText: '비밀번호',
+                      maxLength : null,
                     ),
                     const SizedBox(
                       height: 10,
@@ -167,6 +170,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       obscureTextState: true,
                       controller: checkController,
                       hintText: '비밀번호 확인',
+                      maxLength : null,
+
                     ),
                     const SizedBox(
                       height: 25,

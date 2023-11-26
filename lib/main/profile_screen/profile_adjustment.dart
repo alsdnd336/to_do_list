@@ -167,6 +167,8 @@ class _ProfileAdjustmentState extends State<ProfileAdjustment> {
                   controller: userNameController,
                   hintText: '이름을 입력해주세요',
                   obscureTextState: false,
+                  maxLength : 20,
+
                 ),
                 const SizedBox(
                   height: 20,
@@ -175,6 +177,8 @@ class _ProfileAdjustmentState extends State<ProfileAdjustment> {
                   controller: userInformationController,
                   hintText: '소개글을 입력해주세요',
                   obscureTextState: false,
+                    maxLength : null,
+
                 ),
                 const SizedBox(
                   height: 20,

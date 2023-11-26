@@ -1,12 +1,9 @@
-import 'dart:io';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:to_do_list/component/posting_widget.dart';
 import 'package:to_do_list/main/profile_screen/profile_adjustment.dart';
-import 'package:to_do_list/provider/home_screen_provider.dart';
 import 'package:to_do_list/provider/main_screen_provider.dart';
 import 'package:to_do_list/provider/userPosts_provider.dart';
 

@@ -9,14 +9,14 @@ class UserPosts_Provider extends ChangeNotifier {
   Future<void> importData(String uid) async {
     // initalized 
     userPosts = [];
-    await FirebaseFirestore.instance.collection('userPosting').doc('userPosting').collection(uid).get().then((value) {
-      print(value.docs.length);
+    await FirebaseFirestore.instance.collection('allPosts').get().then((value) {
       value.docs.forEach((element) {
-
-        userPosts.add(element.data());
+        if(element.data()['uid'] == uid) {
+          userPosts.add(element.data());
+        }
       });
     });
-    
+    userPosts = userPosts.reversed.toList();
     notifyListeners();
   }
 }
